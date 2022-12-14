@@ -1,0 +1,1811 @@
+PRACTICAL-1
+AIM: Implementation of Finite Automata and String Validation.
+Code:
+#include <stdio.h>
+int main()
+{
+    int length;	
+    printf("Enter length of a string: ");
+    scanf("%d", &length);
+
+    char str[length];
+    int i, flag = '0';
+    printf("Enter a string to be checked: ");
+    scanf("%s", str);
+    for (i = 0; str[i] != '\0'; i++)
+    {
+        if (str[i] == '\0' || str[i] == '\1')
+        {
+            flag = 1;
+        }
+        else
+        {
+            flag = 0;
+            break;
+        }
+    }
+    if (flag == 1)
+    {
+        if (str[length - 1] == '1' && str[length - 2] == '\0')
+        {
+            printf("String is accepted");
+        }
+        else
+        {
+            printf("String is not accepted");
+        }
+    }
+    else
+    {
+        printf("String is not accepted");
+    }
+}
+ 
+OUTPUT:
+ 
+
+ 
+PRACTICAL-2
+AIM: Introduction to Lex tools
+
+•	What is Lex?
+ Lex is a program that generates lexical analyzer. It is used with YACC parser generator.
+ The lexical analyzer is a program that transforms an input stream into a sequence of tokens.
+ It reads the input stream and produces the source code as output through implementing the lexical analyzer in the C program.
+ Lex tool itself is a lex compiler.
+
+•	Function of Lex
+ Firstly, lexical analyzer creates a program lex.1 in the Lex language. Then Lex compiler runs the lex.1 program and produces a C program lex.yy.c.
+ Finally, C compiler runs the lex.yy.c program and produces an object program a.out.
+ a.out is lexical analyzer that transforms an input stream into a sequence of tokens.
+
+
+ 
+•	Structure of Lex Programs
+ Lex program will be in following form:
+declarations
+%%
+translation rules
+%%
+auxiliary functions
+
+ Declarations This section includes declaration of variables, constants and regular definitions.
+ Translation rules It contains regular expressions and code segments.
+
+Form : Pattern {Action}
+
+Pattern is a regular expression or regular definition. Action refers to segments of code.
+ Auxiliary functions This section holds additional functions which are used in actions.
+These functions are compiled separately and loaded with lexical analyzer.
+ Lexical analyzer produced by lex starts its process by reading one character at a time until a valid match for a pattern is found.
+ Once a match is found, the associated action takes place to produce token.
+ The token is then given to parser for further processing
+
+•	Lex Source Program
+
+It is a language used for specifying or representing Lexical Analyzer.
+There are two parts of the LEX source program:
+1.	Auxiliary Definitions
+2.	Translation Rules
+3.	
+ 
+
+ 
+	Auxiliary Definition
+It denotes the regular expression of the form.
+Distinct Names $\begin{bmatrix}D_{1} & =\:\:R_{1} \D_{2} & =\:\:R_{2} \D_{n} &= \:\:R_{n} \end{bmatrix}$ Regular Expressions
+Where,
+ Distinct Names (Di)→ Shortcut name of Regular Expression
+ Regular Expression (Ri)→ Notation to represent a collection of input symbols.
+	Example
+ Auxiliary Definition for Identifiers:
+
+ Auxiliary Definition for Signed Numbers
+integer=digit digit* sign = + | -
+signedinteger = sign integer
+ Auxiliary Definition for Decimal Numbers
+decimal = signedinteger . integer | sign.integer
+ Auxiliary Definition for Exponential Numbers
+Exponential – No = (decimal | signedinteger) E signedinteger
+ Auxiliary Definition for Real Numbers
+Real-No. = decimal | Exponential – No
+
+
+	Translation Rules
+ It is a set of rules or actions which tells Lexical Analyzer what it has to do or what it has to return to parser on encountering the token.
+ It consists of statements of the form:
+P1 {Action1} P2 {Action2}
+.
+ 
+.
+Pn {Actionn}
+Where,
+Pi → Pattern or Regular Expression consisting of input alphabets and Auxiliary definition names.
+Actioni → It is a piece of code that gets executed whenever a token is Recognized. Each Actioni specifies a set of statements to be executed whenever each regular expression or pattern Pi matches with the input string.
+
+	Example
+ Translation Rules for "Keywords"
+
+ We can see that if Lexical Analyzer is given the input "begin", it will recognize the token "begin" and Lexical Analyzer will return 1 as integer code to the parser.
+ Translation Rules for "Identifiers"
+letter (letter + digit)* {Install ( );return 6}
+
+ If Lexical Analyzer is given the token which is an "identifier", then the Action taken by the Lexical Analyzer is to install or store the name in the symbol table & return value 6 as integer code to the parser.
+
+	Example of Lex Tool
+
+%{
+#include<stdio.h>
+%}
+%%
+"someshwari" {printf("rudra");}
+.*	{printf("Wrong Input");}
+%%
+void main()
+{
+printf("Enter Input: ");
+yylex();
+}
+
+OUTPUT:
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PRACTICAL-3
+AIM: Implement following Programs Using Lex.
+
+(a) Generate Count of words
+Code:
+
+%{
+#include<stdio.h>
+#include<string.h>
+int i = 0;
+%}
+%%
+([a-zA-Z0-9])* {i++;}
+"\n" 
+{printf("%d\n", i); i = 0;}
+%%
+int yywrap(void){}
+int main()
+{
+yylex();
+return 0;
+}
+OUTPUT:
+ 
+
+(b) Caesar Cypher
+%{
+    #include<stdio.h>
+    int shift;
+%}
+
+%%
+[a-z] {char ch = yytext[0];
+ch += shift;
+if (ch> 'z') ch -= 26;
+printf ("%c" ,ch );
+}
+[A-Z] { char ch = yytext[0] ;
+ch += shift;
+if (ch> 'Z') ch -= 26;
+printf("%c",ch);
+}
+. {exit(0);}
+%%
+
+int main()
+{
+    printf("Enter an no. of alphabet to shift: \n");  
+    
+    scanf("%d", &shift);
+    printf("Enter the string: \n");
+    yylex();
+    
+    
+    return 0;
+}
+int yywrap(){
+    return 1;
+}
+
+OUTPUT:
+ 
+
+
+
+
+(c) Extract single and multiline comments from C Program.
+Input file:
+#include<stdio.h>
+void main()
+{
+//printf("Hello World!!!)
+/*
+Hii
+I am a student
+from SSASIT
+*/
+printf("CD Practicals 200760107506");
+}
+
+Code:
+%{
+#include<stdio.h>
+%}
+%%
+\/\/(.*) {};
+\/\*(.*\n)*.*\*\/ {};
+%%
+int yywrap()
+{
+return 1;
+}
+void main()
+{
+yyin=fopen("CD_Prac-3cip.c","r");
+yyout=fopen("CD_Prac-3cop.c","w");
+yylex();
+}
+OUTPUT:
+ 
+Practical-4
+AIM: Implement following Programs Using Lex.
+
+(a) Convert Roman to Decimal
+Code:
+WS	[ \t]+
+%%
+	int total=0;
+I	total += 1;
+IV	total += 4;
+V	total += 5;
+IX	total += 9;
+X	total += 10;
+XL	total += 40;
+L	total += 50;
+XC	total += 90;
+C	total += 100;
+CD	total += 400;
+D	total += 500;
+CM	total += 900;
+M	total += 1000;
+{WS}	|
+\n	return total;
+%%
+int main (void) {
+   int first, second;
+   printf("Enter Roman Number:");
+
+   first = yylex ();
+   second = yylex ();
+
+   printf ("Decimal Number = %d \n", first);
+   return 0;
+   }
+OUTPUT:
+ 
+(b) Check weather given statement is compound or simple.
+Code:
+%{
+	#include<stdio.h>
+	int flag=0;%}
+%%
+and |
+or |
+but |
+because |
+if |
+then |
+nevertheless  { flag=1; }
+.  ;
+\n  { return 0; }
+%%
+int main()
+{
+	printf("Enter the sentence:\n");
+	yylex();
+	if(flag==0)
+		printf("Simple sentence\n");
+	else
+		printf("compound sentence\n");
+}
+int yywrap( )
+{
+	return 1;
+}
+OUTPUT:
+
+ 
+(c) Extract html tags from .html file.
+Htmlfile.txt:
+
+<html>
+<head>
+<title>Href Attribute Example</title>
+</head>
+<body>
+<h1>Href Attribute Example</h1>
+<p>
+<a href="https://www.freecodecamp.org/contribute/">The freeCodeCamp 
+</p>
+<p>
+someshwari rudra
+</p>
+</body>
+</html>
+
+Code:
+
+%{
+#include<stdio.h>
+%}
+%%
+"<"[^>]*> {printf("%s\n", yytext); }
+. ;
+%%
+int yywrap(){}
+
+int main(int argc, char*argv[])
+{
+yyin = fopen("htmlfile.txt","r");
+yylex();
+
+return 0;
+}
+
+ 
+OUTPUT:
+ 
+ 
+PRACTICAL-5
+AIM: Implementation of Recursive Descent Parser without backtracking
+Input: The string to be parsed.
+Output: Whether string parsed successfully or not. Explanation:
+Students have to implement the recursive procedure for RDP for a typical grammar. The production no. are displayed as they are used to derive the string.
+Code:
+#include<stdio.h> 
+char str[20];
+int p=0; 
+char l;
+int flag = 0;
+void E();
+
+void getString(){
+printf("--------------Production Rules---------------------	\nE -> iE'\nE' -> +tE/^\nNote: Must last character is $\nUsing Above Grammer Enter a String : "); 
+scanf("%[^\n]%*c", str);
+// printf("%s", l);
+}
+
+void error(){
+flag = 0;
+}
+
+int match(char t){
+    if(l == '$'){
+        flag = 1;
+        return 0;
+    }
+    if(l == t){
+        p++;
+        l = str[p];
+        
+    }else{
+        error();
+        return 0;
+    }
+}
+void Edesh(){
+    if(l == '+'){
+        match('+');
+        match('i');
+         E();
+    }else{
+        error();
+    }
+}
+void E(){
+    l = str[p];
+    match('i');
+    if(l != '$'){
+        Edesh();
+    }
+}
+
+void main(){
+    getString();
+    E();
+    match('$'); 
+    if(flag == 1){
+        printf("String is accepted\n");
+    }else{
+        printf("String is not accepted\n");
+    }
+}
+ OUTPUT:
+ 
+
+
+PRACTICAL-6
+AIM: Finding “First” set
+Input: The string consists of grammar symbols.
+Output: The First set for a given string.
+Explanation:
+The student has to assume a typical grammar. The program when run will ask for the string to be entered. The program will find the First set of the given string.
+CODE:
+#include<stdio.h>
+#include<ctype.h>
+void FIRST(char[],char );
+void addToResultSet(char[],char);
+int numOfProductions;
+char productionSet[10][10];
+main()
+{
+    int i;
+    char choice; 
+    char c;
+    char result[20];
+    printf("How many number of productions ? :");
+    scanf(" %d",&numOfProductions);
+    for(i=0;i<numOfProductions;i++)//read production string eg: E=E+T
+    {
+        printf("Enter productions Number %d : ",i+1);
+        scanf(" %s",productionSet[i]);
+    }
+    do
+    {
+        printf("\n Find the FIRST of  :");
+        scanf(" %c",&c);
+        FIRST(result,c); //Compute FIRST; Get Answer in 'result' array
+        printf("\n FIRST(%c)= { ",c);
+        for(i=0;result[i]!='\0';i++)
+        printf(" %c ",result[i]);       //Display result
+        printf("}\n");
+         printf("press 'y' to continue : ");
+        scanf(" %c",&choice);
+    }
+    while(choice=='y'||choice =='Y');
+}
+void FIRST(char* Result,char c)
+{
+    int i,j,k;
+    char subResult[20];
+    int foundEpsilon;
+    subResult[0]='\0';
+    Result[0]='\0';
+    //If X is terminal, FIRST(X) = {X}.
+    if(!(isupper(c)))
+    {
+        addToResultSet(Result,c);
+               return ;
+    }
+    //If X is non terminal
+    //Read each production
+    for(i=0;i<numOfProductions;i++)
+    {
+//Find production with X as LHS
+        if(productionSet[i][0]==c)
+        {
+//If X → ε is a production, then add ε to FIRST(X).
+ if(productionSet[i][2]=='$') addToResultSet(Result,'$');
+            //If X is a non-terminal, and X → Y1 Y2 … Yk
+            //is a production, then add a to FIRST(X)
+            //if for some i, a is in FIRST(Yi),
+            //and ε is in all of FIRST(Y1), …, FIRST(Yi-1).
+      else
+            {
+                j=2;
+                while(productionSet[i][j]!='\0')
+                {
+                foundEpsilon=0;
+                FIRST(subResult,productionSet[i][j]);
+                for(k=0;subResult[k]!='\0';k++)
+                    addToResultSet(Result,subResult[k]);
+                 for(k=0;subResult[k]!='\0';k++)
+                     if(subResult[k]=='$')
+                     {
+                         foundEpsilon=1;
+                         break;
+                     }
+                 //No ε found, no need to check next element
+                 if(!foundEpsilon)
+                     break;
+                 j++;
+                }
+            }
+    }
+}
+    return ;
+}
+/* addToResultSet adds the computed
+ *element to result set. 
+ *This code avoids multiple inclusion of elements
+  */
+void addToResultSet(char Result[],char val)
+{
+    int k;
+    for(k=0 ;Result[k]!='\0';k++)
+        if(Result[k]==val)
+            return;
+    Result[k]=val;
+    Result[k+1]='\0';
+}
+OUTPUT:
+ 
+PRACTICAL-7
+AIM: Generate 3-tuple intermediate code for given infix expression
+CODE:
+#include <stdio.h>
+#include <conio.h>
+#include <string.h>
+int i = 1, j = 0, no = 0, tmpch = 90;
+char str[100], left[15], right[15];
+void findopr();
+void explore();
+void fleft(int);
+void fright(int);
+struct exp{
+    int pos;
+    char op;
+} 
+k[15];
+void main(){
+    printf("\t\tINTERMEDIATE CODE GENERATION\n\n");
+    printf("Enter the Expression :");
+    scanf("%s", str);
+    printf("The intermediate code:\n");
+    findopr();
+    explore();
+}
+void findopr(){
+    for (i = 0; str[i] != '\0'; i++)
+        if (str[i] == ':'){
+            k[j].pos = i;
+            k[j++].op = ':';
+        }
+    for (i = 0; str[i] != '\0'; i++)
+        if (str[i] == '/'){
+            k[j].pos = i;
+            k[j++].op = '/';
+        }
+    for (i = 0; str[i] != '\0'; i++)
+        if (str[i] == '*'){
+            k[j].pos = i;
+            k[j++].op = '*';
+        }
+
+    for (i = 0; str[i] != '\0'; i++)
+        if (str[i] == '+'){
+            k[j].pos = i;
+
+            k[j++].op = '+';
+        }
+    for (i = 0; str[i] != '\0'; i++)
+        if (str[i] == '-'){
+            k[j].pos = i;
+            k[j++].op = '-';
+        }
+}
+void explore(){
+    i = 1;
+    while (k[i].op != '\0'){
+        fleft(k[i].pos);
+        fright(k[i].pos);
+        str[k[i].pos] = tmpch--;
+        printf("\t%c := %s%c%s\t\t", str[k[i].pos], left, k[i].op, right);
+        printf("\n");
+
+        i++;
+    }
+    fright(-1);
+    if (no == 0){
+        fleft(strlen(str));
+        printf("\t%s := %s", right, left);
+    }
+    printf("\t%s := %c", right, str[k[--i].pos]);
+}
+void fleft(int x){
+    int w = 0, flag = 0;
+    x--;
+    while (x != -1 && str[x] != '+' && str[x] != '*' && str[x] != '=' && str[x] != '\0' && str[x] != '-' && str[x] != '/' && str[x] != ':'){
+        if (str[x] != '$' && flag == 0)  {
+            left[w++] = str[x];
+            left[w] = '\0';
+            str[x] = '$';
+            flag = 1;
+        }
+        x--;
+    }
+}
+void fright(int x){
+    int w = 0, flag = 0;
+    x++;
+    while (x != -1 && str[x] != '+' && str[x] != '*' && str[x] != '\0' && str[x] != '=' && str[x] != ':' && str[x] != '-' && str[x] != '/'){
+
+        if (str[x] != '$' && flag == 0){
+            right[w++] = str[x];
+            right[w] = '\0';
+            str[x] = '$';
+            flag = 1;
+        }
+        x++;
+    }
+}
+OUTPUT:
+ 
+
+
+
+
+
+
+
+
+
+ 
+PRACTICAL-8
+AIM: Extract Predecessor and Successor from given Control Flow Graph
+Code:
+#include <iostream> 
+using namespace std;
+struct Node{     
+    int key;
+struct Node *left, *right;
+}
+void findPreSuc(Node *root, Node *&pre, Node *&suc, int key)
+{
+    if (root == NULL)
+        return;
+    if (root->key == key)
+    {
+        if (root->left != NULL)
+        {
+            Node *tmp = root->left;
+            while (tmp->right)
+                tmp = tmp->right;
+            pre = tmp;
+        }
+        if (root->right != NULL)
+        {
+            Node *tmp = root->right;
+            while (tmp->left)
+                tmp = tmp->left;
+            suc = tmp;
+        }
+        return;
+    }
+    if (root->key > key)
+    {
+        suc = root;
+        findPreSuc(root->right, pre, suc, key);
+    }
+    else
+    {
+        pre = root;
+        findPreSuc(root->right, pre, suc, key);
+    }
+}
+Node *newNode(int item)
+{
+    Node *temp = new Node;
+    temp->key = item;
+    temp->left = temp->right = NULL;
+    return temp;
+}
+Node *insert(Node *node, int key)
+{
+    if (node == NULL)
+        return newNode(key);
+    if (key < node->key)
+        node->left = insert(node->left, key);
+    else
+        node->right = insert(node->right, key);
+    return node;
+}
+int main()
+{
+    int key = 65;
+    Node *root = NULL;
+    root = insert(root, 50);
+    insert(root, 30);
+    insert(root, 20);
+    insert(root, 40);
+    insert(root, 70);
+    insert(root, 60);
+    insert(root, 80);
+    Node *pre = NULL, *suc = NULL;
+    findPreSuc(root, pre, suc, key);
+    if (pre != NULL)
+        cout << "Predecessor is " << pre->key << endl;
+    else
+        cout << "No Predecessor";
+    if (suc != NULL)
+        cout << "Successor is " << suc->key << endl;
+    else
+        cout << "No Successor";
+    return 0;
+}
+ 
+OUTPUT:
+ 
+ 
+PRACTICAL-9
+	AIM: Introduction to Lex:
+	YACC stands for Yet Another Compiler Compiler.
+	It finds hierarchical structure of program.
+	It provides a tool to produce a parser for a given grammar.
+	It is a program designed to compile a LALR (1) grammar.
+	It is used to produce the source code of the syntactic analyzer of the language produced by LALR (1) grammar.
+	The input of YACC is the rule or grammar and the output is a C program.
+
+	YACC Input File:
+	YACC input file is divided into three parts:
+/* definitions */
+....
+
+%%
+/* rules */
+....
+%%
+
+/* auxiliary routines */
+....
+	The definition part includes information about the tokens used in the syntax definition.
+	The rules part contains grammar definition in a modified BNF form.
+	The auxiliary routines part is only C code.It includes function definitions for every function needed in rules part.
+
+	YACC Output File:
+	The output of YACC is a file named y.tab.c
+	If it contains the main() definition, it must be compiled to be executable.
+	If called with the –d option in the command line, Yacc produces as output a header file y.tab.h with all its specific definition (particularly important are token definitions to be included, for example, in a Lex input file).
+	If called with the –v option, Yacc produces as output a file y.output containing a textual description of the LALR(1) parsing table used by the parser. This is useful for tracking down how the parser solves conflicts.
+
+ 
+	Calculator program:
+Code:
+Lex file:
+%{
+#include<stdio.h>
+#include "y.tab.h"
+extern int yylval;
+%}
+%%
+[0-9]+ {
+		yylval=atoi(yytext);
+		return NUMBER;
+	}
+[\t] ;
+[\n] return 0;
+. return yytext[0];
+%%
+int yywrap()
+{
+return 1;
+}
+Yacc File:
+%{
+#include<stdio.h>
+int flag=0;
+%}
+%token NUMBER
+%left '+' '-'
+%left '*' '/' '%'
+%left '(' ')'
+%%
+ArithmeticExpression: E{
+		printf("\nResult=%d\n", $$);
+		return 0;
+		};
+E:E'+'E {$$=$1+$3;}
+|E'-'E {$$=$1-$3;}
+|E'*'E {$$=$1*$3;}
+|E'/'E {$$=$1/$3;}
+|E'%'E {$$=$1%$3;}
+|'('E')' {$$=$2;}
+| NUMBER {$$=$1;}
+;
+%%
+void main()
+{
+printf("\n Enter Arithmetic Expression\n");
+yyparse();
+if(flag==0)
+printf("\nEntered arithmetic expression is Valid\n\n");
+}
+void yyerror()
+{
+printf("\nEntered arithmetic expression is Invalid\n\n");
+flag=1;
+}
+Output:
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+PRACTICAL-10
+AIM: Finding “Follow” set
+Input: The string consists of grammar symbols.
+Output: The Follow set for a given string.
+Explanation: The student has to assume a typical grammar. The program when run will ask for the string to be entered. The program will find the Follow set of the given string.
+CODE:
+#include<stdio.h>
+#include<ctype.h>
+#include<string.h>
+ 
+void followfirst(char, int, int);
+void follow(char c);
+ 
+// Function to calculate First
+void findfirst(char, int, int);
+ 
+int count, n = 0;
+ 
+// Stores the final result
+// of the First Sets
+char calc_first[10][100];
+ 
+// Stores the final result
+// of the Follow Sets
+char calc_follow[10][100];
+int m = 0;
+ 
+// Stores the production rules
+char production[10][10];
+char f[10], first[10];
+int k;
+char ck;
+int e;
+ 
+int main(int argc, char **argv)
+{
+    int jm = 0;
+    int km = 0;
+    int i, choice;
+    char c, ch;
+    count = 8;
+     
+    // The Input grammar
+    strcpy(production[0], "E=TR");
+    strcpy(production[1], "R=+TR");
+    strcpy(production[2], "R=#");
+    strcpy(production[3], "T=FY");
+    strcpy(production[4], "Y=*FY");
+    strcpy(production[5], "Y=#");
+    strcpy(production[6], "F=(E)");
+    strcpy(production[7], "F=i");
+     
+    int kay;
+    char done[count];
+    int ptr = -1;
+     
+    // Initializing the calc_first array
+    for(k = 0; k < count; k++) {
+        for(kay = 0; kay < 100; kay++) {
+            calc_first[k][kay] = '!';
+        }
+    }
+    int point1 = 0, point2, xxx;
+     
+    for(k = 0; k < count; k++)
+    {
+        c = production[k][0];
+        point2 = 0;
+        xxx = 0;
+         
+        // Checking if First of c has
+        // already been calculated
+        for(kay = 0; kay <= ptr; kay++)
+            if(c == done[kay])
+                xxx = 1;
+                 
+        if (xxx == 1)
+            continue;
+         
+        // Function call   
+        findfirst(c, 0, 0);
+        ptr += 1;
+         
+        // Adding c to the calculated list
+        done[ptr] = c;
+
+        calc_first[point1][point2++] = c;
+         
+        // Printing the First Sets of the grammar
+        for(i = 0 + jm; i < n; i++) {
+            int lark = 0, chk = 0;
+             
+            for(lark = 0; lark < point2; lark++) {
+                 
+                if (first[i] == calc_first[point1][lark])
+                {
+                    chk = 1;
+                    break;
+                }
+            }
+            if(chk == 0)
+            {
+                calc_first[point1][point2++] = first[i];
+            }
+        }
+        jm = n;
+        point1++;
+    }
+    printf("\n");
+    char donee[count];
+    ptr = -1;
+     
+    // Initializing the calc_follow array
+    for(k = 0; k < count; k++) {
+        for(kay = 0; kay < 100; kay++) {
+            calc_follow[k][kay] = '!';
+        }
+    }
+    point1 = 0;
+    int land = 0;
+    for(e = 0; e < count; e++)
+    {
+        ck = production[e][0];
+        point2 = 0;
+        xxx = 0;
+         
+        // Checking if Follow of ck
+        // has already been calculated
+        for(kay = 0; kay <= ptr; kay++)
+            if(ck == donee[kay])
+                xxx = 1;
+                 
+        if (xxx == 1)
+            continue;
+        land += 1;
+         
+        // Function call
+        follow(ck);
+        ptr += 1;
+         
+        // Adding ck to the calculated list
+        donee[ptr] = ck;
+        printf(" Follow(%c) = { ", ck);
+        calc_follow[point1][point2++] = ck;
+         
+        // Printing the Follow Sets of the grammar
+        for(i = 0 + km; i < m; i++) {
+            int lark = 0, chk = 0;
+            for(lark = 0; lark < point2; lark++)
+            {
+                if (f[i] == calc_follow[point1][lark])
+                {
+                    chk = 1;
+                    break;
+                }
+            }
+            if(chk == 0)
+            {
+                printf("%c, ", f[i]);
+                calc_follow[point1][point2++] = f[i];
+            }
+        }
+        printf(" }\n\n");
+        km = m;
+        point1++;
+    }
+}
+ 
+void follow(char c)
+{
+    int i, j;
+     
+    // Adding "$" to the follow
+    // set of the start symbol
+    if(production[0][0] == c) {
+        f[m++] = '$';
+    }
+    for(i = 0; i < 10; i++)
+    {
+        for(j = 2;j < 10; j++)
+        {
+            if(production[i][j] == c)
+            {
+                if(production[i][j+1] != '\0')
+                {
+                    // Calculate the first of the next
+                    // Non-Terminal in the production
+                    followfirst(production[i][j+1], i, (j+2));
+                }
+                 
+                if(production[i][j+1]=='\0' && c!=production[i][0])
+                {
+                    // Calculate the follow of the Non-Terminal
+                    // in the L.H.S. of the production
+                    follow(production[i][0]);
+                }
+            }
+        }
+    }
+}
+ 
+void findfirst(char c, int q1, int q2)
+{
+    int j;
+     
+    // The case where we
+    // encounter a Terminal
+    if(!(isupper(c))) {
+        first[n++] = c;
+    }
+    for(j = 0; j < count; j++)
+    {
+        if(production[j][0] == c)
+        {
+            if(production[j][2] == '#')
+            {
+                if(production[q1][q2] == '\0')
+                    first[n++] = '#';
+                else if(production[q1][q2] != '\0'
+                          && (q1 != 0 || q2 != 0))
+                {
+                    // Recursion to calculate First of New
+                    // Non-Terminal we encounter after epsilon
+                    findfirst(production[q1][q2], q1, (q2+1));
+                }
+                else
+                    first[n++] = '#';
+            }
+            else if(!isupper(production[j][2]))
+            {
+                first[n++] = production[j][2];
+            }
+            else
+            {
+                // Recursion to calculate First of
+                // New Non-Terminal we encounter
+                // at the beginning
+                findfirst(production[j][2], j, 3);
+            }
+        }
+    }
+}
+ 
+void followfirst(char c, int c1, int c2)
+{
+    int k;
+     
+    // The case where we encounter
+    // a Terminal
+    if(!(isupper(c)))
+        f[m++] = c;
+    else
+    {
+        int i = 0, j = 1;
+        for(i = 0; i < count; i++)
+        {
+            if(calc_first[i][0] == c)
+                break;
+        }
+         
+        //Including the First set of the
+        // Non-Terminal in the Follow of
+        // the original query
+        while(calc_first[i][j] != '!')
+        {
+            if(calc_first[i][j] != '#')
+            {
+                f[m++] = calc_first[i][j];
+            }
+            else
+            {
+                if(production[c1][c2] == '\0')
+                {
+                    // Case where we reach the
+                    // end of a production
+                    follow(production[c1][0]);
+                }
+                else
+                {
+                    // Recursion to the next symbol
+                    // in case we encounter a "#"
+                    followfirst(production[c1][c2], c1, c2+1);
+                }
+            }
+            j++;
+        }
+    }
+}
+OUTPUT:
+ 
+
+
+
+
+
+
+
+
+
+
+
+PRACTICAL-11
+AIM: Implement a C program for constructing LL (1) parsing.
+Text.txt
+
+E->TA
+A->+TA|^
+T->FB
+B->*FB|^
+F->t|(E)
+
+CODE:
+#include<stdio.h>
+#include<string.h>
+#define TSIZE 128
+int table[100][TSIZE];
+char terminal[TSIZE];
+char nonterminal[26];
+struct product {
+    char str[100];
+    int len;
+}
+pro[20];
+int no_pro;
+char first[26][TSIZE];
+char follow[26][TSIZE];
+char first_rhs[100][TSIZE];
+int isNT(char c) {
+    return c >= 'A' && c <= 'Z';
+}
+void readFromFile() {
+    FILE* fptr;
+    fptr = fopen("text.txt", "r");
+    char buffer[255];
+    int i;
+    int j;
+    while (fgets(buffer, sizeof(buffer), fptr)) {
+        printf("%s", buffer);
+        j = 0;
+        nonterminal[buffer[0] - 'A'] = 1;
+        for (i = 0; i < strlen(buffer) - 1; ++i) {
+            if (buffer[i] == '|') {
+                ++no_pro;
+                pro[no_pro - 1].str[j] = '\0';
+                pro[no_pro - 1].len = j;
+                pro[no_pro].str[0] = pro[no_pro - 1].str[0];
+                pro[no_pro].str[1] = pro[no_pro - 1].str[1];
+                pro[no_pro].str[2] = pro[no_pro - 1].str[2];
+                j = 3;
+            }
+            else {
+                pro[no_pro].str[j] = buffer[i];
+                ++j;
+                if (!isNT(buffer[i]) && buffer[i] != '-' && buffer[i] != '>') {
+                    terminal[buffer[i]] = 1;
+                }
+            }
+        }
+        pro[no_pro].len = j;
+        ++no_pro;
+    }
+}
+void add_FIRST_A_to_FOLLOW_B(char A, char B) {
+    int i;
+    for (i = 0; i < TSIZE; ++i) {
+        if (i != '^')
+            follow[B - 'A'][i] = follow[B - 'A'][i] || first[A - 'A'][i];
+    }
+}
+void add_FOLLOW_A_to_FOLLOW_B(char A, char B) {
+    int i;
+    for (i = 0; i < TSIZE; ++i) {
+        if (i != '^')
+            follow[B - 'A'][i] = follow[B - 'A'][i] || follow[A - 'A'][i];
+    }
+}
+void FOLLOW() {
+    int t = 0;
+    int i, j, k, x;
+    while (t++ < no_pro) {
+        for (k = 0; k < 26; ++k) {
+            if (!nonterminal[k])    continue;
+            char nt = k + 'A';
+            for (i = 0; i < no_pro; ++i) {
+                for (j = 3; j < pro[i].len; ++j) {
+                    if (nt == pro[i].str[j]) {
+                        for (x = j + 1; x < pro[i].len; ++x) {
+                            char sc = pro[i].str[x];
+                            if (isNT(sc)) {
+                                add_FIRST_A_to_FOLLOW_B(sc, nt);
+                                if (first[sc - 'A']['^'])
+                                    continue;
+                            }
+                            else {
+                                follow[nt - 'A'][sc] = 1;
+                            }
+                            break;
+                        }
+                        if (x == pro[i].len)
+                            add_FOLLOW_A_to_FOLLOW_B(pro[i].str[0], nt);
+                    }
+                }
+            }
+        }
+    }
+}
+void add_FIRST_A_to_FIRST_B(char A, char B) {
+    int i;
+    for (i = 0; i < TSIZE; ++i) {
+        if (i != '^') {
+            first[B - 'A'][i] = first[A - 'A'][i] || first[B - 'A'][i];
+        }
+    }
+}
+void FIRST() {
+    int i, j;
+    int t = 0;
+    while (t < no_pro) {
+        for (i = 0; i < no_pro; ++i) {
+            for (j = 3; j < pro[i].len; ++j) {
+                char sc = pro[i].str[j];
+                if (isNT(sc)) {
+                    add_FIRST_A_to_FIRST_B(sc, pro[i].str[0]);
+                    if (first[sc - 'A']['^'])
+                        continue;
+                }
+                else {
+                    first[pro[i].str[0] - 'A'][sc] = 1;
+                }
+                break;
+            }
+            if (j == pro[i].len)
+                first[pro[i].str[0] - 'A']['^'] = 1;
+        }
+        ++t;
+    }
+}
+void add_FIRST_A_to_FIRST_RHS__B(char A, int B) {
+    int i;
+    for (i = 0; i < TSIZE; ++i) {
+        if (i != '^')
+            first_rhs[B][i] = first[A - 'A'][i] || first_rhs[B][i];
+    }
+}
+// Calculates FIRST(ß) for each A->ß
+void FIRST_RHS() {
+    int i, j;
+    int t = 0;
+    while (t < no_pro) {
+        for (i = 0; i < no_pro; ++i) {
+            for (j = 3; j < pro[i].len; ++j) {
+                char sc = pro[i].str[j];
+                if (isNT(sc)) {
+                    add_FIRST_A_to_FIRST_RHS__B(sc, i);
+                    if (first[sc - 'A']['^'])
+                        continue;
+                }
+                else {
+                    first_rhs[i][sc] = 1;
+                }
+                break;
+            }
+            if (j == pro[i].len)
+                first_rhs[i]['^'] = 1;
+        }
+        ++t;
+    }
+}
+int main() {
+    readFromFile();
+    follow[pro[0].str[0] - 'A']['$'] = 1;
+    FIRST();
+    FOLLOW();
+    FIRST_RHS();
+    int i, j, k;
+    
+    // display first of each variable
+    printf("\n");
+    for (i = 0; i < no_pro; ++i) {
+        if (i == 0 || (pro[i - 1].str[0] != pro[i].str[0])) {
+            char c = pro[i].str[0];
+            printf("FIRST OF %c: ", c);
+            for (j = 0; j < TSIZE; ++j) {
+                if (first[c - 'A'][j]) {
+                    printf("%c ", j);
+                }
+            }
+            printf("\n");
+        }
+    }
+    printf("\n");
+    for (i = 0; i < no_pro; ++i) {
+        if (i == 0 || (pro[i - 1].str[0] != pro[i].str[0])) {
+            char c = pro[i].str[0];
+            printf("FOLLOW OF %c: ", c);
+            for (j = 0; j < TSIZE; ++j) {
+                if (follow[c - 'A'][j]) {
+                    printf("%c ", j);
+                }
+            }
+            printf("\n");
+        }
+    }
+    // display first of each variable ß
+    // in form A->ß
+    printf("\n");
+    for (i = 0; i < no_pro; ++i) {
+        printf("FIRST OF %s: ", pro[i].str);
+        for (j = 0; j < TSIZE; ++j) {
+            if (first_rhs[i][j]) {
+                printf("%c ", j);
+            }
+        }
+        printf("\n");
+    }
+        terminal['$'] = 1;
+    terminal['^'] = 0;
+    
+    // printing parse table
+    printf("\n");
+    printf("\n\t**************** LL(1) PARSING TABLE *******************\n");
+    printf("\t--------------------------------------------------------\n");
+    printf("%-10s", "");
+    for (i = 0; i < TSIZE; ++i) {
+        if (terminal[i])    printf("%-10c", i);
+    }
+    printf("\n");
+    int p = 0;
+    for (i = 0; i < no_pro; ++i) {
+        if (i != 0 && (pro[i].str[0] != pro[i - 1].str[0]))
+            p = p + 1;
+        for (j = 0; j < TSIZE; ++j) {
+            if (first_rhs[i][j] && j != '^') {
+                table[p][j] = i + 1;
+            }
+            else if (first_rhs[i]['^']) {
+                for (k = 0; k < TSIZE; ++k) {
+                    if (follow[pro[i].str[0] - 'A'][k]) {
+                        table[p][k] = i + 1;
+                    }
+                }
+            }
+        }
+    }
+    k = 0;
+    for (i = 0; i < no_pro; ++i) {
+        if (i == 0 || (pro[i - 1].str[0] != pro[i].str[0])) {
+            printf("%-10c", pro[i].str[0]);
+            for (j = 0; j < TSIZE; ++j) {
+                if (table[k][j]) {
+                    printf("%-10s", pro[table[k][j] - 1].str);
+                }
+                else if (terminal[j]) {
+                    printf("%-10s", "");
+                }
+            }
+            ++k;
+            printf("\n");
+        }
+    }
+}
+OUTPUT:
+ 
+
+
+
+
+
+
+
+ 
+PRACTICAL-12
+AIM: Implement a C program to implement LALR parsing.
+Code:
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<conio.h>
+void push(char *, int *, char); 
+char stacktop(char *);
+void isproduct(char, char); 
+int ister(char); 
+int isnter(char); 
+int isstate(char); 
+void error();
+void isreduce(char, char); 
+char pop(char *, int *);
+void printt(char *, int *, char[], int); 
+void rep(char[], int); 
+struct action{
+    char row[6][5];
+};
+const struct action A[12] = {
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"emp", "sg", "emp", "emp", "emp", "acc"},
+    {"emp", "rc", "sh", "emp", "rc", "rc"},
+    {"emp", "re", "re", "emp", "re", "re"},
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"emp", "rg", "rg", "emp", "rg", "rg"},
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"sf", "emp", "emp", "se", "emp", "emp"},
+    {"emp", "sg", "emp", "emp", "sl", "emp"},
+    {"emp", "rb", "sh", "emp", "rb", "rb"},
+    {"emp", "rb", "rd", "emp", "rd", "rd"},
+    {"emp", "rf", "rf", "emp", "rf", "rf"}
+};
+struct gotol{
+    char r[3][4];
+};
+const struct gotol G[12] = {
+    {"b", "c", "d"},
+    {"emp", "emp", "emp"},
+    {"emp", "emp", "emp"},
+    {"emp", "emp", "emp"},
+    {"i", "c", "d"},
+    {"emp", "emp", "emp"},
+    {"emp", "j", "d"},
+    {"emp", "emp", "k"},
+    {"emp", "emp", "emp"},
+    {"emp", "emp", "emp"},
+};
+char ter[6] = {'i', '+', '*', ')', '(', '$'};
+char nter[3] = {'E', 'T', 'F'};
+char states[12] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'm', 'j', 'k', 'l'};
+char stack[100]; 
+int top = -1; 
+char temp[10]; 
+struct grammar{
+    char left; 
+    char right[5];
+};
+const struct grammar rl[6] = {
+    {'E', "e+T"},
+    {'E', "T"},
+    {'T', "T*F"},
+    {'T', "F"},
+    {'F', "(E)"}, 
+    {'F', "i"},
+};
+void main(){
+    char inp[80], x, p, dl[80], y, bl = 'a'; 
+    int i = 0, j, k, l, n, m, c, len; 
+    printf(" Enter the input :"); 
+    scanf("%s", inp); 
+    len = strlen(inp); 
+    inp[len] = '$'; 
+    inp[len + 1] = '\0'; 
+    push(stack, &top, bl); 
+    printf("\n stack \t\t\t input");
+    printt(stack, &top, inp, i); 
+    do{
+        x = inp[i]; 
+        p = stacktop(stack); 
+        isproduct(x, p); 
+        if (strcmp(temp, "emp") == 0) 
+            error();
+        if (strcmp(temp, "acc") == 0) 
+            break; 
+        else{
+            if (temp[0] == 's') {
+                push(stack, &top, inp[i]); 
+                push(stack, &top, temp[1]); 
+                i++;
+            }
+            else{
+                if (temp[0] == 'r'){ 
+                    j = isstate(temp[1]); 
+                    strcpy(temp, rl[j - 2].right); 
+                    dl[0] = rl[j - 2].left; 
+                    dl[1] = '\0'; 
+                    n = strlen(temp); 
+                    for (k = 0; k < 2 * n; k++)
+                        pop(stack, &top); 
+                    for (m = 0; dl[m] != '\0'; m++)
+                        push(stack, &top, dl[m]); 
+                    l = top; 
+                    y = stack[l - 1]; 
+                    isreduce(y, dl[0]); 
+                    for (m = 0; temp[m] != '\0'; m++)
+                        push(stack, &top, temp[m]);
+                }
+            }
+        }
+        printt(stack, &top, inp, i); 
+    } while (inp[i] != '\0'); 
+    if (strcmp(temp, "acc") == 0) 
+        printf(" \n accept the input ");
+    else
+        printf(" \n do not accept the input ");
+    getch();
+}
+void push(char *s, int *sp, char item) {
+    if (*sp == 100) 
+        printf(" stack is full ");
+    else{
+        *sp = *sp + 1;
+        s[*sp] = item;
+    }
+}
+char stacktop(char *s) {
+    char i; 
+    i = s[top]; 
+    return i;
+}
+void isproduct(char x, char p) {
+    int k, l; 
+    k = ister(x); 
+    l = isstate(p); 
+    strcpy(temp, A[l - 1].row[k - 1]);
+}
+int ister(char x) {
+    int i; 
+    for (i = 0; i < 6; i++)
+        if (x == ter[i]) 
+            return i + 1; 
+    return 0;
+}
+int isnter(char x) {
+    int i; 
+    for (i = 0; i < 3; i++)
+        if (x == nter[i]) 
+            return i + 1; 
+    return 0;
+}
+int isstate(char p) {
+    int i; 
+    for (i = 0; i < 12; i++)
+        if (p == states[i])
+            return i + 1; 
+    return 0;
+}
+void error(){
+    printf(" error in the input ");
+    exit(0);
+}
+void isreduce(char x, char p) {
+    int k, l; 
+    k = isstate(x); 
+    l = isnter(p); 
+    strcpy(temp, G[k - 1].r[l - 1]);
+}
+char pop(char *s, int *sp) {
+    char item; 
+    if (*sp == -1) 
+        printf(" stack is empty ");
+    else{
+        item = s[*sp]; 
+        *sp = *sp - 1;
+    }
+    return item;
+}
+void printt(char *t, int *p, char inp[], int i) {
+    int r; 
+    printf("\n");
+    for (r = 0; r <= *p; r++)
+        rep(t, r); 
+    printf("\t\t\t");
+    for (r = i; inp[r] != '\0'; r++)
+        printf("%c", inp[r]);
+}
+void rep(char t[], int r) {
+    char c; 
+    c = t[r]; 
+    switch (c) {
+    case 'a':
+        printf("0");
+        break; 
+    case 'b':
+        printf("1");
+        break; 
+    case 'c':
+        printf("2");
+        break; 
+    case 'd':
+        printf("3");
+        break; 
+    case 'e':
+        printf("4");
+        break; 
+    case 'f':
+        printf("5");
+        break; 
+    case 'g':
+        printf("6");
+        break; 
+    case 'h':
+        printf("7");
+        break; 
+    case 'm':
+        printf("8");
+        break; 
+    case 'j':
+        printf("9");
+        break; 
+    case 'k':
+        printf("10");
+        break; 
+    case 'l':
+        printf("11");
+        break; 
+    default:
+        printf("%c", t[r]); 
+        break;
+    }
+}
+OUTPUT:
+ 
+ 
+PRACTICAL-13
+AIM: Implement a C program to implement operator precedence parsing.
+CODE:
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+char *input;
+int i=0;
+char lasthandle[6],stack[50],handles[][5]={")E(","E*E","E+E","i","E^E"};
+//(E) becomes )E( when pushed to stack
+
+int top=0,l;
+char prec[9][9]={
+
+                            /*input*/
+
+            /*stack    +    -   *   /   ^   i   (   )   $  */
+
+            /*  + */  '>', '>','<','<','<','<','<','>','>',
+
+            /*  - */  '>', '>','<','<','<','<','<','>','>',
+
+            /*  * */  '>', '>','>','>','<','<','<','>','>',
+
+            /*  / */  '>', '>','>','>','<','<','<','>','>',
+
+            /*  ^ */  '>', '>','>','>','<','<','<','>','>',
+
+            /*  i */  '>', '>','>','>','>','e','e','>','>',
+
+            /*  ( */  '<', '<','<','<','<','<','<','>','e',
+
+            /*  ) */  '>', '>','>','>','>','e','e','>','>',
+
+            /*  $ */  '<', '<','<','<','<','<','<','<','>',
+
+                };
+
+int getindex(char c)
+{
+switch(c)
+    {
+    case '+':return 0;
+    case '-':return 1;
+    case '*':return 2;
+    case '/':return 3;
+    case '^':return 4;
+    case 'i':return 5;
+    case '(':return 6;
+    case ')':return 7;
+    case '$':return 8;
+    }
+}
+
+int shift()
+{
+stack[++top]=*(input+i++);
+stack[top+1]='\0';
+}
+int reduce()
+{
+int i,len,found,t;
+for(i=0;i<5;i++)//selecting handles
+    {
+    len=strlen(handles[i]);
+    if(stack[top]==handles[i][0]&&top+1>=len)
+        {
+        found=1;
+        for(t=0;t<len;t++)
+            {
+            if(stack[top-t]!=handles[i][t])
+                {
+                found=0;
+                break;
+                }
+            }
+        if(found==1)
+            {
+            stack[top-t+1]='E';
+            top=top-t+1;
+            strcpy(lasthandle,handles[i]);
+            stack[top+1]='\0';
+            return 1;//successful reduction
+            }
+        }
+   }
+return 0;
+}
+void dispstack()
+{
+int j;
+for(j=0;j<=top;j++)
+    printf("%c",stack[j]);
+}
+void dispinput()
+{
+int j;
+for(j=i;j<l;j++)
+    printf("%c",*(input+j));
+}
+void main()
+{
+int j;
+
+input=(char*)malloc(50*sizeof(char));
+printf("\nEnter the string\n");
+scanf("%s",input);
+input=strcat(input,"$");
+l=strlen(input);
+strcpy(stack,"$");
+printf("\nSTACK\tINPUT\tACTION");
+while(i<=l)
+	{
+	shift();
+	printf("\n");
+	dispstack();
+	printf("\t");
+	dispinput();
+	printf("\tShift");
+	if(prec[getindex(stack[top])][getindex(input[i])]=='>')
+		{
+		while(reduce())
+			{
+			printf("\n");
+			dispstack();
+			printf("\t");
+			dispinput();
+			printf("\tReduced: E->%s",lasthandle);
+			}
+		}
+	}
+
+if(strcmp(stack,"$E$")==0)
+    printf("\nAccepted;");
+else
+    printf("\nNot Accepted;");
+}
+ 
+OUTPUT:
+ 
+
+
+
+
+
